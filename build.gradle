@@ -31,6 +31,16 @@ dependencies {
 	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.0'
 }
 
+allprojects {
+	tasks.withType(JavaCompile).tap {
+		configureEach {
+			options.deprecation = true
+		}
+	}
+}
+
+
+
 tasks.named('test') {
 	useJUnitPlatform()
 }
