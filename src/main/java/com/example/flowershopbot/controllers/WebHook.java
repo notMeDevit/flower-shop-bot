@@ -3,6 +3,7 @@ package com.example.flowershopbot.controllers;
 import com.example.flowershopbot.configurations.MessageConfiguration;
 import com.example.flowershopbot.properties.webhookConfig.FacebookHookRequest;
 import com.example.flowershopbot.properties.webhookConfig.FacebookMessageResponse;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -50,21 +51,70 @@ MessageConfiguration messageConfiguration;
     @ResponseStatus(HttpStatus.OK)
     public void post(@RequestBody FacebookHookRequest request){
         logger.info("Message from chat: {}",request);
+        //System.out.println(request.toString());
+
         request.getEntry().forEach(e->{
             e.getMessaging().forEach(m->{
                 String id = m.getSender().get("id");
-                sendReply(id,"This is a test message");
+                System.out.println(request.toString());
+                //String userMsg = m.getMessage().getText();
+                //System.out.println(userMsg);
+                sendReply(id,"Hello would you like to buy a flower arrangement?");
+
             });
         });
     }
+
+
+
+
+
+
+    private void respondToCustomer(String id, String text){
+
+        //System.out.println(request.);
+        //String id tells you who to respond to ->
+        //String Text replys with the correct function from POST
+
+        int flowerId = 0;
+
+        if(text.equals("yes") || text.equals("Yes")){
+
+            sendReply(id,"Please send the UUID for the flower arrangement");
+
+            if(flowerId != 0){
+
+
+            }
+
+        }
+        else {
+
+            System.out.println("");
+        }
+
+        //if reply = yes, sendReply()
+
+
+    }
+
+
+    private void getFlowerIdFromPicture(String text){
+
+
+
+    }
+
 
     private void sendReply(String id,String text){
         FacebookMessageResponse response = new FacebookMessageResponse();
         response.setMessage_type("text");
         response.getRecipient().put("id",id);
         response.getMessage().put("text",text);
+
         HttpEntity<FacebookMessageResponse> entity = new HttpEntity<>(response);
         String result = template.postForEntity(FB_MSG_URL,entity,String.class).getBody();
+
         logger.info("Message result: {}",result);
 
     }
