@@ -17,11 +17,16 @@ import java.io.IOException;
 public class MessageConfiguration {
 
 
-    public void sendMessage() throws IOException {
+
+        public void checkDatabase(int flowerId) {
+
+
+
+
+        }
 
 
 
 
 
-    }
 }

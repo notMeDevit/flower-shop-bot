@@ -1,4 +1,4 @@
-package com.example.flowershopbot.properties.webhookConfig;
+package com.example.flowershopbot.properties.webhook_config;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

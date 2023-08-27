@@ -1,9 +1,8 @@
 package com.example.flowershopbot.controllers;
 
 import com.example.flowershopbot.configurations.MessageConfiguration;
-import com.example.flowershopbot.properties.webhookConfig.FacebookHookRequest;
-import com.example.flowershopbot.properties.webhookConfig.FacebookMessageResponse;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes;
+import com.example.flowershopbot.properties.webhook_config.FacebookHookRequest;
+import com.example.flowershopbot.properties.webhook_config.FacebookMessageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -12,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import lombok.Builder;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.regex.Pattern;
 //import com.apple.eawt.Application;
 //import com.fasterxml.jackson.*;
 
@@ -32,6 +33,7 @@ MessageConfiguration messageConfiguration;
     //logger to watch what is happening in our bot
     private final Logger logger = LoggerFactory.getLogger(WebHook.class);
     private final RestTemplate template = new RestTemplate();
+    private final Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
 
 
     //This is necessary for register a webhook in facebook
@@ -50,59 +52,57 @@ MessageConfiguration messageConfiguration;
     @PostMapping(value = "/webhook")
     @ResponseStatus(HttpStatus.OK)
     public void post(@RequestBody FacebookHookRequest request){
+
         logger.info("Message from chat: {}",request);
         //System.out.println(request.toString());
 
-        request.getEntry().forEach(e->{
-            e.getMessaging().forEach(m->{
-                String id = m.getSender().get("id");
-                System.out.println(request.toString());
-                //String userMsg = m.getMessage().getText();
-                //System.out.println(userMsg);
-                sendReply(id,"Hello would you like to buy a flower arrangement?");
+        try {
+            request.getEntry().forEach(e -> {
+                e.getMessaging().forEach(m -> {
 
+                    String id = m.getSender().get("id");
+                    String userMsg = m.getMessage().getText();
+
+                    if (isNumeric(userMsg)) {
+
+                        sendReply(id, "Checking Database for flower arrangement");
+                        System.out.println(userMsg);
+                    } else if (userMsg.equals("yes") || userMsg.equals("Yes")) {
+                        sendReply(id, "Please send the UUID for the flower arrangement");
+
+                    } else {
+                        sendReply(id, "Hello would you like to buy a flower arrangement?");
+                    }
+                });
             });
-        });
-    }
-
-
-
-
-
-
-    private void respondToCustomer(String id, String text){
-
-        //System.out.println(request.);
-        //String id tells you who to respond to ->
-        //String Text replys with the correct function from POST
-
-        int flowerId = 0;
-
-        if(text.equals("yes") || text.equals("Yes")){
-
-            sendReply(id,"Please send the UUID for the flower arrangement");
-
-            if(flowerId != 0){
-
-
-            }
 
         }
-        else {
-
-            System.out.println("");
+        catch (Exception ex){
+            logger.info("Exception",ex);
         }
+}
 
-        //if reply = yes, sendReply()
 
 
+    public static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 
+    //save regex checker of numeric expression for later
 
-    private void getFlowerIdFromPicture(String text){
-
-
-
+    public boolean isNumericRegex(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        return pattern.matcher(strNum).matches();
     }
 
 
