@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import lombok.Builder;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.regex.Pattern;
 //import com.apple.eawt.Application;
 //import com.fasterxml.jackson.*;
@@ -34,6 +35,7 @@ MessageConfiguration messageConfiguration;
     private final Logger logger = LoggerFactory.getLogger(WebHook.class);
     private final RestTemplate template = new RestTemplate();
     private final Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+    //private final MessageConfiguration messageConfiguration = new MessageConfiguration();
 
 
     //This is necessary for register a webhook in facebook
@@ -62,11 +64,25 @@ MessageConfiguration messageConfiguration;
 
                     String id = m.getSender().get("id");
                     String userMsg = m.getMessage().getText();
+                    boolean isMatch = false;
 
                     if (isNumeric(userMsg)) {
 
                         sendReply(id, "Checking Database for flower arrangement");
-                        System.out.println(userMsg);
+                        try {
+                            isMatch = messageConfiguration.checkDb(Integer.valueOf(userMsg));
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+
+                        if(isMatch){
+                            sendReply(id,"Flower Arrangement Matches");
+                        }
+                        else{
+                            sendReply(id,"Flower Arrangement does not match. Please resend flower arrangement id.");
+                        }
+                        // sendReply("The price is <var> please confirm and then answer picture postback, and then proceed with payment
+
                     } else if (userMsg.equals("yes") || userMsg.equals("Yes")) {
                         sendReply(id, "Please send the UUID for the flower arrangement");
 
@@ -81,7 +97,14 @@ MessageConfiguration messageConfiguration;
             logger.info("Exception",ex);
         }
 }
+/*
 
+ try{
+      int final_personId = messageConfiguration.checkDb(Integer.valueOf(userMsg));
+ }catch (IOException ex) {
+      throw new RuntimeException(ex);
+                        }
+ */
 
 
     public static boolean isNumeric(String strNum) {
