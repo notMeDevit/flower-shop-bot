@@ -1,8 +1,14 @@
 package com.example.flowershopbot.controllers;
 
 import com.example.flowershopbot.configurations.MessageConfiguration;
+import com.example.flowershopbot.properties.attachment_config.FaceBookAttachment;
+import com.example.flowershopbot.properties.supabase_config.ReadTable;
 import com.example.flowershopbot.properties.webhook_config.FacebookHookRequest;
 import com.example.flowershopbot.properties.webhook_config.FacebookMessageResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -53,12 +59,20 @@ MessageConfiguration messageConfiguration;
     //This method  reply all messages with: 'This is a test message'
     @PostMapping(value = "/webhook")
     @ResponseStatus(HttpStatus.OK)
-    public void post(@RequestBody FacebookHookRequest request){
+    public void post(@RequestBody FacebookHookRequest request) throws JsonProcessingException { //@RequestBody ){
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonBook = mapper.writeValueAsString(request);
+        System.out.println(jsonBook);
+
 
         logger.info("Message from chat: {}",request);
         //System.out.println(request.toString());
 
         try {
+
+           
             request.getEntry().forEach(e -> {
                 e.getMessaging().forEach(m -> {
 
@@ -77,6 +91,7 @@ MessageConfiguration messageConfiguration;
 
                         if(isMatch){
                             sendReply(id,"Flower Arrangement Matches");
+
                         }
                         else{
                             sendReply(id,"Flower Arrangement does not match. Please resend flower arrangement id.");
@@ -85,6 +100,7 @@ MessageConfiguration messageConfiguration;
 
                     } else if (userMsg.equals("yes") || userMsg.equals("Yes")) {
                         sendReply(id, "Please send the UUID for the flower arrangement");
+
 
                     } else {
                         sendReply(id, "Hello would you like to buy a flower arrangement?");
@@ -143,3 +159,13 @@ MessageConfiguration messageConfiguration;
     }
 }
 
+  /*
+        Object jsonString = mapper.readValue(request.toString(), Object.class);
+        String indentedString = mapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(jsonString);
+
+
+        System.out.println(jsonString);
+        System.out.println(indentedString);
+
+         */
