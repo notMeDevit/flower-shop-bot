@@ -49,6 +49,14 @@ public class MessageConfiguration {
 
         }
 
+        public void sendAttachment(String url){
+
+
+
+
+
+        }
+
 
 
         public void updateDb(int personId) throws IOException {

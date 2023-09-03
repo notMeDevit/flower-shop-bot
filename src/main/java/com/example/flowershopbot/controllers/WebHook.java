@@ -76,14 +76,18 @@ MessageConfiguration messageConfiguration;
                     if(m.getMessage().getText() == null){
                         m.getMessage().getAttachments().forEach(z -> {
 
-                            if(z.getType().equals("image")){
+                            if(z.getType().equals("image") || z.getType().equals("fallback")){
 
                                     String personId = m.getSender().get("id");
                                     String attachmentId = z.getPayload().getUrl();
                                     logger.info("{}",attachmentId);
 
                                     sendReply(personId,"You sent an attachment, with id: " + attachmentId);
-                                
+                                    sendReply(personId,"Sending attachment back now.");
+
+                                    //if text is empty, upload image url to db and check there
+                                //list attachment id with post?
+                                //supabase buckets to store image
                             }
                         });}
 
