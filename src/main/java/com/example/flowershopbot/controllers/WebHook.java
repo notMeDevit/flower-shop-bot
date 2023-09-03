@@ -74,10 +74,10 @@ MessageConfiguration messageConfiguration;
                 e.getMessaging().forEach(m -> {
 
                     if(m.getMessage().getText() == null){
-                        if(m.getMessage().getAttachment().getType().equals("template")){
+                        if(m.getMessage().getAttachments().getType().equals("template")){
                             System.out.println("true");
 
-                            m.getMessage().getAttachment().getPayload().getElements().forEach(z -> {
+                            m.getMessage().getAttachments().getPayload().getElements().forEach(z -> {
 
                                         String personId = m.getSender().get("id");
                                         String attachmentId = z.getAttachment_id();
