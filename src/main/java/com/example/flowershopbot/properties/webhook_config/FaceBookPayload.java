@@ -5,15 +5,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class FacebookMessage implements Serializable {
+public class FaceBookPayload {
 
-    private String mid;
-    private Long seq;
-    private String text;
-    private FaceBookAttachment attachment;
+    private String template_type;
+    private ArrayList<FaceBookElements> elements = new ArrayList<>();
 }

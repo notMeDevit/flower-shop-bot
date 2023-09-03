@@ -6,14 +6,20 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class FacebookMessage implements Serializable {
+public class FaceBookElements implements Serializable {
 
-    private String mid;
-    private Long seq;
-    private String text;
-    private FaceBookAttachment attachment;
+
+    private String media_type;
+    private String attachment_id;
 }
+
+
+/*
+"media_type": "<image|video>",
+"attachment_id": "<ATTACHMENT_ID>"
+ */

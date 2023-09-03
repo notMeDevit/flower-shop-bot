@@ -1,7 +1,6 @@
 package com.example.flowershopbot.controllers;
 
 import com.example.flowershopbot.configurations.MessageConfiguration;
-import com.example.flowershopbot.properties.attachment_config.FaceBookAttachment;
 import com.example.flowershopbot.properties.supabase_config.ReadTable;
 import com.example.flowershopbot.properties.webhook_config.FacebookHookRequest;
 import com.example.flowershopbot.properties.webhook_config.FacebookMessageResponse;
@@ -64,54 +63,75 @@ MessageConfiguration messageConfiguration;
 
         ObjectMapper mapper = new ObjectMapper();
         String jsonBook = mapper.writeValueAsString(request);
-        System.out.println(jsonBook);
+        logger.info("{}",jsonBook);
 
 
         logger.info("Message from chat: {}",request);
         //System.out.println(request.toString());
 
         try {
-
-           
             request.getEntry().forEach(e -> {
                 e.getMessaging().forEach(m -> {
 
-                    String id = m.getSender().get("id");
-                    String userMsg = m.getMessage().getText();
-                    boolean isMatch = false;
+                    if(m.getMessage().getText() == null){
+                        if(m.getMessage().getAttachment().getType().equals("template")){
+                            System.out.println("true");
 
-                    if (isNumeric(userMsg)) {
+                            m.getMessage().getAttachment().getPayload().getElements().forEach(z -> {
 
-                        sendReply(id, "Checking Database for flower arrangement");
-                        try {
-                            isMatch = messageConfiguration.checkDb(Integer.valueOf(userMsg));
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
+                                        String personId = m.getSender().get("id");
+                                        String attachmentId = z.getAttachment_id();
+                                        System.out.print(attachmentId);
+
+                                        sendReply(personId,"You sent an attachment, id: " + attachmentId);
+
+
+                                    });
+                            /* Refer to  -> if request is attachment,
+                            respond with "is this the correct picture?" postback example in Javascript code */
                         }
+                    }
+                    else {
 
-                        if(isMatch){
-                            sendReply(id,"Flower Arrangement Matches");
+                        String id = m.getSender().get("id");
+                        String userMsg = m.getMessage().getText();
+                        boolean isMatch = false;
 
+
+                        if (isNumeric(userMsg)) {
+
+                            sendReply(id, "Checking Database for flower arrangement");
+                            try {
+                                isMatch = messageConfiguration.checkDb(Integer.valueOf(userMsg));
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
+
+                            if (isMatch) {
+                                sendReply(id, "Flower Arrangement Matches");
+
+                            } else {
+                                sendReply(id, "Flower Arrangement does not match. Please resend flower arrangement id.");
+                            }
+                            // sendReply("The price is <var> please confirm and then answer picture postback, and then proceed with payment
+
+                        } else if (userMsg.equals("yes") || userMsg.equals("Yes")) {
+                            sendReply(id, "Please send the UUID for the flower arrangement");
+
+
+                        } else {
+                            sendReply(id, "Hello would you like to buy a flower arrangement?");
                         }
-                        else{
-                            sendReply(id,"Flower Arrangement does not match. Please resend flower arrangement id.");
-                        }
-                        // sendReply("The price is <var> please confirm and then answer picture postback, and then proceed with payment
-
-                    } else if (userMsg.equals("yes") || userMsg.equals("Yes")) {
-                        sendReply(id, "Please send the UUID for the flower arrangement");
-
-
-                    } else {
-                        sendReply(id, "Hello would you like to buy a flower arrangement?");
                     }
                 });
             });
+
 
         }
         catch (Exception ex){
             logger.info("Exception",ex);
         }
+
 }
 /*
 

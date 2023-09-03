@@ -6,14 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class FacebookMessage implements Serializable {
+public class FaceBookAttachment implements Serializable {
 
-    private String mid;
-    private Long seq;
-    private String text;
-    private FaceBookAttachment attachment;
+    private String type;
+    private FaceBookPayload payload;
 }
