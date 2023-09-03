@@ -74,23 +74,20 @@ MessageConfiguration messageConfiguration;
                 e.getMessaging().forEach(m -> {
 
                     if(m.getMessage().getText() == null){
-                        if(m.getMessage().getAttachments().getType().equals("template")){
-                            System.out.println("true");
+                        m.getMessage().getAttachments().forEach(z -> {
 
-                            m.getMessage().getAttachments().getPayload().getElements().forEach(z -> {
+                            if(z.getType().equals("template")){
 
-                                        String personId = m.getSender().get("id");
-                                        String attachmentId = z.getAttachment_id();
-                                        System.out.print(attachmentId);
+                                z.getPayload().getElements().forEach(y -> {
+                                    String personId = m.getSender().get("id");
+                                    String attachmentId = y.getAttachment_id();
+                                    logger.info("{}",attachmentId);
 
-                                        sendReply(personId,"You sent an attachment, id: " + attachmentId);
+                                    sendReply(personId,"You sent an attachment, with id: " + attachmentId);
+                                });
+                            }
+                        });}
 
-
-                                    });
-                            /* Refer to  -> if request is attachment,
-                            respond with "is this the correct picture?" postback example in Javascript code */
-                        }
-                    }
                     else {
 
                         String id = m.getSender().get("id");
@@ -141,6 +138,25 @@ MessageConfiguration messageConfiguration;
       throw new RuntimeException(ex);
                         }
  */
+
+            /* if(m.getMessage().getAttachments().getType().equals("template")){
+                            System.out.println("true");
+
+                            m.getMessage().getAttachments().getPayload().getElements().forEach(z -> {
+
+                                        String personId = m.getSender().get("id");
+                                        String attachmentId = z.getAttachment_id();
+                                        System.out.print(attachmentId);
+
+                                        sendReply(personId,"You sent an attachment, id: " + attachmentId);
+
+
+                                    });
+                            /* Refer to  -> if request is attachment,
+                            respond with "is this the correct picture?" postback example in Javascript code
+
+
+                        }*/
 
 
     public static boolean isNumeric(String strNum) {

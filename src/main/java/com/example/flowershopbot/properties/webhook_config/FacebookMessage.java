@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,5 +17,6 @@ public class FacebookMessage implements Serializable {
     private String mid;
     private Long seq;
     private String text;
-    private FaceBookAttachment attachments;
+    //private FaceBookAttachment attachments;
+    private ArrayList<FaceBookAttachment> attachments = new ArrayList<>();
 }
