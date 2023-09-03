@@ -14,6 +14,7 @@ import java.util.ArrayList;
 @ToString
 public class FaceBookPayload {
 
+    private String url;
     private String template_type;
     private ArrayList<FaceBookElements> elements = new ArrayList<>();
 }

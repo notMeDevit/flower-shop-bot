@@ -78,13 +78,12 @@ MessageConfiguration messageConfiguration;
 
                             if(z.getType().equals("image")){
 
-                                z.getPayload().getElements().forEach(y -> {
                                     String personId = m.getSender().get("id");
-                                    String attachmentId = y.getAttachment_id();
+                                    String attachmentId = z.getPayload().getUrl();
                                     logger.info("{}",attachmentId);
 
                                     sendReply(personId,"You sent an attachment, with id: " + attachmentId);
-                                });
+                                
                             }
                         });}
 
