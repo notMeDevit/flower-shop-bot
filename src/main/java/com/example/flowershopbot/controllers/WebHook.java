@@ -76,7 +76,7 @@ MessageConfiguration messageConfiguration;
                     if(m.getMessage().getText() == null){
                         m.getMessage().getAttachments().forEach(z -> {
 
-                            if(z.getType().equals("template")){
+                            if(z.getType().equals("image")){
 
                                 z.getPayload().getElements().forEach(y -> {
                                     String personId = m.getSender().get("id");
