@@ -188,7 +188,7 @@ public class WebHook {
                     String payload = null ; 
 
                     if(userMsg == null ){
-                         payload = m.getPostBack().getPayload();
+                         payload = m.getPostback().getPayload();
                          System.out.println(payload);
                     }
                     else {
