@@ -184,22 +184,29 @@ public class WebHook {
                 e.getMessaging().forEach(m -> {
 
                     String id = m.getSender().get("id");
-                    String userMsg = m.getMessage().getText();
-                    String payload = m.getMessage().getPayload();
+                    String userMsg = null; 
+                    String payload = null ; 
+
+                    if(userMsg == null ){
+                         payload = m.getPostBack().getPayload();
+                         System.out.println(payload);
+                    }
+                    else {
 
 
-                    boolean isMatch = false;
-                    String attchmnt = null;
-                    String type = null;
-                    String req_body = null;
+                        boolean isMatch = false;
+                        String attchmnt = null;
+                        String type = null;
+                        String req_body = null;
 
-                    System.out.print(payload);
+                        System.out.print(payload);
 
 
-                    try {
-                        messageService.botRouteMessage(id,userMsg);
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                        try {
+                            messageService.botRouteMessage(id, userMsg);
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
 
 

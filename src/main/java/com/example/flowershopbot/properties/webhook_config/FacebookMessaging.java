@@ -18,4 +18,5 @@ public class FacebookMessaging implements Serializable {
     private Map<String,String> recipient;
     private Long timestamp;
     private FacebookMessage message;
+    private FaceBookPostBack postBack;
 }
