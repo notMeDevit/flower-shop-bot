@@ -18,4 +18,5 @@ public class FacebookMessageResponse implements Serializable {
     private String message_type;
     private Map<String,String> recipient = new HashMap<>();
     private Map<String,String> message = new HashMap<>();
+
 }
