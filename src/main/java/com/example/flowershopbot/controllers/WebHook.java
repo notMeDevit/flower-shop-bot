@@ -1,71 +1,27 @@
 package com.example.flowershopbot.controllers;
 
 import com.example.flowershopbot.configurations.MessageConfiguration;
+import com.example.flowershopbot.properties.data_reqbody.Data;
 import com.example.flowershopbot.properties.fb_templates.product_template.*;
 import com.example.flowershopbot.properties.fbattchment_config.*;
 import com.example.flowershopbot.properties.generic_template.*;
-import com.example.flowershopbot.properties.supabase_config.ReadTable;
 import com.example.flowershopbot.properties.webhook_config.FacebookHookRequest;
 import com.example.flowershopbot.properties.webhook_config.FacebookMessageResponse;
 import com.example.flowershopbot.services.MessageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jetbrains.annotations.NotNull;
+import lombok.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import lombok.Builder;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-
-import javax.print.attribute.standard.Media;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ch.qos.logback.core.pattern.color.YellowCompositeConverter;
-import lombok.Builder;
-import com.fasterxml.jackson.annotation.*;
-//import com.apple.eawt.Application;
-//import com.fasterxml.jackson.*;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
-import lombok.Builder;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
-//import com.apple.eawt.Application;
-//import com.fasterxml.jackson.*;
 
 
 @Builder
@@ -164,8 +120,29 @@ public class WebHook {
 
     @PostMapping(value = "/webhook/test_function")
     public void testFunction() throws IOException {
-        boolean idFlag = true;
-        messageConfiguration.getProductId(idFlag);
+        boolean idFlag = false;
+        String psid = "6567177600041771";
+        ArrayList<String> productNames = messageConfiguration.getProductId(idFlag);
+
+        String btnTemplate = messageService.buttonTemplateBuilder(psid,productNames);
+        messageConfiguration.sendButtonTemplate(btnTemplate);
+    }
+
+    //Custom controller for Noahs Company Endpoint
+    @PostMapping(value = "/companyEndpoint")
+    public void postUponClick(@RequestBody Data data){ // Model Class Data is Annotated with "@RequestBody"
+
+
+        // Model class contains Getters and Setters by default ->
+        // Use getters and setter in C# (I know that C# has those when you create model classes I think)
+        int originalRequestNumber = data.getOriginalRequestNumber();
+        // Store json in variable ^^
+        /*
+            data{
+                  "OriginalRequestNumber": int
+
+                }
+         */
     }
 
     //This method  reply all messages with: 'This is a test message'
@@ -180,36 +157,27 @@ public class WebHook {
 
 
 
+
             request.getEntry().forEach(e -> {
                 e.getMessaging().forEach(m -> {
 
                     String id = m.getSender().get("id");
-                    String userMsg = null; 
-                    String payload = null ; 
+                    String payload = null;
+                    String userMsg = null;
 
-                    if(userMsg == null ){
-                         payload = m.getPostback().getPayload();
-                         System.out.println(payload);
+                    if(m.getMessage() == null){
+                        payload = m.getPostback().getPayload();
+                        System.out.println(payload);
                     }
-                    else {
+                    else{
+                        userMsg = m.getMessage().getText();
+                    }
 
-
-                        boolean isMatch = false;
-                        String attchmnt = null;
-                        String type = null;
-                        String req_body = null;
-
-                        System.out.print(payload);
-
-
-                        try {
-                            messageService.botRouteMessage(id, userMsg);
+                    try {
+                            messageService.botRouteMessage(id, userMsg, payload);
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
                         }
-                    }
-
-
                 });
             });
 

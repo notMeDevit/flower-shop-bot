@@ -1,12 +1,9 @@
 package com.example.flowershopbot.services;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Scanner;
-
 import com.example.flowershopbot.configurations.MessageConfiguration;
 import com.example.flowershopbot.controllers.WebHook;
+import com.example.flowershopbot.properties.fb_templates.button_template.ButtonTemplate.*;
 import com.example.flowershopbot.properties.fb_templates.product_template.*;
 import com.example.flowershopbot.properties.fbattchment_config.*;
 import com.example.flowershopbot.properties.generic_template.*;
@@ -20,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 @Service
@@ -43,37 +43,41 @@ public class MessageService {
         this.messageConfiguration = messageConfiguration;
     }
 
-    public void botRouteMessage(String person_id, String userMsg) throws IOException {
+    public void botRouteMessage(String person_id, String userMsg, String payload) throws IOException {
 
         // Build Flower-Shop-Template and extract the JSON Object
         String genericTemplateJson = genericTemplateBuilder(person_id);
         String productCatalogTemplate = catalogBuilder(person_id);
-
-        //String attachmentTemplate = attachmentBuilder(person_id,attchmnt,type);
         ArrayList<String> productName = null;
-
-        //Gets an arraylist of product names to check against user selection
-        boolean productNameFlag = false;
-        ArrayList<String> getProductNames = new ArrayList<>();
-        getProductNames = messageConfiguration.getProductId(productNameFlag);
+        boolean productMatch = false;
+        String buttonTemplate = null;
 
         try {
             productName = messageConfiguration.getProductId(false);
+            buttonTemplateBuilder(person_id,productName);
+            /*for(String items : productName){
+                if(userMsg.toLowerCase().equals(items.toLowerCase())){
+                    productMatch = true;
+                    break;
+                }
+            }*/
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
 
 
-        if (productName.contains(userMsg)) {
-
+        if ((userMsg != null)) {
             sendReply(person_id, "Excellent Choice");
         }
         //userMsg.payload
-        else if (userMsg.equals("A")) {
+        else if (payload != null && payload.equals("A") && userMsg == null) {
+            //Send the catalog Template then button template
             customerPreBuiltService(productCatalogTemplate);
+            messageConfiguration.sendButtonTemplate(buttonTemplate);
+            logger.info("Test Passed: Pre-Built Arrangement Selected By Customer");
 
-        } else if (userMsg.equals("B")) {
-            System.out.println("B");
+        } else if (payload != null && payload.equals("B") && userMsg == null) {
+            System.out.println("Test Passed: Custom Arrangement Selected By Customer");
 
         } else {
             // Put the JSON Object into the configuration function and send the first message!(Generic Template)
@@ -83,7 +87,12 @@ public class MessageService {
 
             }
         }
-
+/*
+    //Gets an arraylist of product names to check against user selection
+    boolean productNameFlag = false;
+    ArrayList<String> getProductNames = new ArrayList<>();
+    getProductNames = messageConfiguration.getProductId(productNameFlag);
+*/
 
     public void customerPreBuiltService(String productCatalogTemplate) throws IOException {
 
@@ -118,6 +127,84 @@ public class MessageService {
         return mapObj.writeValueAsString(jsonObject);
     }
 
+    public String buttonTemplateBuilder(String psid, ArrayList<String> productNames){
+        ArrayList<BtnButtons> buttons_array = new ArrayList<>();
+
+        for(String items : productNames){
+
+            BtnButtons buttons = BtnButtons.builder()
+                    .type("postback")
+                    .payload(items)
+                    .title(items)
+                    .build();
+
+            buttons_array.add(buttons);
+
+        }
+
+
+
+        BtnPayload payload = BtnPayload.builder()
+
+                .template_type("button")
+                .text("Select a Flower Arrangement")
+                .buttons(buttons_array)
+                .build();
+
+        BtnAttachment attachment = BtnAttachment.builder()
+                .type("template")
+                .payload(payload)
+                .build();
+
+        BtnMessage message = BtnMessage.builder()
+                .attachment(attachment)
+                .build();
+
+        BtnRecipient recipient = BtnRecipient.builder()
+
+                .id(psid)
+                .build();
+
+        ButtonTemplate buttonTemplate = ButtonTemplate.builder()
+                .message(message)
+                .recipient(recipient)
+                .build();
+
+        String finalJson = "";
+        try {
+            finalJson = jsonStringify(buttonTemplate);
+        } catch (JsonProcessingException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        return finalJson;
+
+
+        /*
+{
+    "recipient": {
+        "id": "6567177600041771"
+    },
+    "message": {
+        "attachment": {
+            "type": "template",
+            "payload": {
+                "template_type": "button",
+                "text": "What do you want to do next?",
+                "buttons": [
+                    {
+                        "type": "web_url",
+                        "url": "https://www.messenger.com",
+                        "title": "Visit Messenger"
+                    }
+                ]
+            }
+        }
+    }
+}
+ */
+
+    }
     @NotNull
     private String attachmentBuilder(String attachment, String type, String psId) {
 
@@ -250,7 +337,7 @@ public class MessageService {
             products_arr.add(fbElementsProducts1);
         }
 
-        fb_payload fbPayload1 = com.example.flowershopbot.properties.fb_templates.product_template.fb_payload.builder()
+        fb_payload fbPayload1 = fb_payload.builder()
                 .template_type("product")
                 .elements(products_arr)
                 .build();
@@ -259,13 +346,13 @@ public class MessageService {
                 .type("template")
                 .payload(fbPayload1)
                 .build();
-        fb_message fbMessage1 = com.example.flowershopbot.properties.fb_templates.product_template.fb_message.builder()
+        fb_message fbMessage1 = fb_message.builder()
                 .attachment(fbAttchmnt1)
                 .build();
         fb_recipient fbRecipient1 = fb_recipient.builder()
                 .id(personId)
                 .build();
-        com.example.flowershopbot.properties.fb_templates.product_template.fb_template_top fbTemplateTop = com.example.flowershopbot.properties.fb_templates.product_template.fb_template_top.builder()
+        fb_template_top fbTemplateTop = fb_template_top.builder()
                 .recipient(fbRecipient1)
                 .message(fbMessage1)
                 .build();

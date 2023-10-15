@@ -71,6 +71,21 @@ public class MessageConfiguration {
 
         }
 
+        public void sendButtonTemplate(String req_body) throws IOException {
+
+                OkHttpClient client = new OkHttpClient().newBuilder()
+                        .build();
+                MediaType mediaType = MediaType.parse("application/json");
+                RequestBody body = RequestBody.create(mediaType, req_body);
+                Request request = new Request.Builder()
+                        .url("https://graph.facebook.com/v8.0/me/messages?access_token=EAAC2kuYox3wBO9sdaE7gtJJu0MKKqKwW87uScCCJNLmXXoZAsqurLSMe7FLeAuJVrYKUrFJEMShxjKbiNWnf88wQNhBZBK6ASXOSQ7xp7FzmhRpgIgi9IctgAfYR2vmteCqCXQSYCjtNyUVNKIIZBn3tZASdEkkP29EnExbL8RQbmGbYmQsXmD4dMu8u9Gps")
+                        .method("POST", body)
+                        .addHeader("Content-Type", "application/json")
+                        .build();
+                Response response = client.newCall(request).execute();
+
+        }
+
         public ArrayList<String> getProductId(boolean idFlag) throws IOException {
 
                 String access_token = "EAAC2kuYox3wBO9sdaE7gtJJu0MKKqKwW87uScCCJNLmXXoZAsqurLSMe7FLeAuJVrYKUrFJEMShxjKbiNWnf88wQNhBZBK6ASXOSQ7xp7FzmhRpgIgi9IctgAfYR2vmteCqCXQSYCjtNyUVNKIIZBn3tZASdEkkP29EnExbL8RQbmGbYmQsXmD4dMu8u9Gps";
@@ -92,14 +107,14 @@ public class MessageConfiguration {
                 ArrayList<String> getData = new ArrayList<>();
 
                 // Get product_id from Json
-                if(idFlag = true) {
+                if(idFlag) {
                         for (ReadCatalog_Data items : jResponseId.getData()) {
                                 getData.add(items.getId());
                         }
                         System.out.println(getData);
                 }
                 // Get Product Name from Json
-                else if(idFlag = false){
+                else{
                         for (ReadCatalog_Data items : jResponseId.getData()) {
                                 getData.add(items.getName());
                         }
