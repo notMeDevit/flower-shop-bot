@@ -32,7 +32,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.0'
-	//implementation 'org.springframework.boot:spring-boot-configuration-processor'
+	implementation 'org.springframework.boot:spring-boot-configuration-processor'
 }
 
 allprojects {
@@ -54,4 +54,4 @@ jar {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-targetCompatibility = JavaVersion.VERSION_11
+//targetCompatibility = JavaVersion.VERSION_11
