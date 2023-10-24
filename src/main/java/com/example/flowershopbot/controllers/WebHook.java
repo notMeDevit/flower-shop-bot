@@ -164,6 +164,7 @@ public class WebHook {
                     String id = m.getSender().get("id");
                     String payload = null;
                     String userMsg = null;
+                    String github = null;
 
                     if(m.getMessage() == null){
                         payload = m.getPostback().getPayload();
