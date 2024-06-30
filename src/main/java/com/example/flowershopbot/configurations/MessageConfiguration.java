@@ -40,7 +40,7 @@ public class MessageConfiguration {
                 ReadTable[] jResponse = mapper.readValue(jsonData,ReadTable[].class);
 
                 for(ReadTable items : jResponse){
-                        if(items.getFlower_id() == flowerId){
+                        if(items.flower_id == flowerId){
                                 idMatchFlag = true;
                         }
                         else{
@@ -99,10 +99,9 @@ public class MessageConfiguration {
                         .method("GET", null)
                         .build();
                 Response response = client.newCall(request).execute();
-                String jsonData = response.body().string();
 
                 ObjectMapper mapper = new ObjectMapper();
-                ReadCatalogTable jResponseId = mapper.readValue(jsonData,ReadCatalogTable.class);
+                ReadCatalogTable jResponseId = mapper.readValue(response.toString(),ReadCatalogTable.class);
                 //ArrayList<String> arr = new ArrayList<>();
                 ArrayList<String> getData = new ArrayList<>();
 

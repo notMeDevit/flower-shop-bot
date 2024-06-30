@@ -128,22 +128,7 @@ public class WebHook {
         messageConfiguration.sendButtonTemplate(btnTemplate);
     }
 
-    //Custom controller for Noahs Company Endpoint
-    @PostMapping(value = "/companyEndpoint")
-    public void postUponClick(@RequestBody Data data){ // Model Class Data is Annotated with "@RequestBody"
 
-
-        // Model class contains Getters and Setters by default ->
-        // Use getters and setter in C# (I know that C# has those when you create model classes I think)
-        int originalRequestNumber = data.getOriginalRequestNumber();
-        // Store json in variable ^^
-        /*
-            data{
-                  "OriginalRequestNumber": int
-
-                }
-         */
-    }
 
     //This method  reply all messages with: 'This is a test message'
     @PostMapping(value = "/webhook")
@@ -155,9 +140,10 @@ public class WebHook {
         String jsonBook = mapper.writeValueAsString(request);
         logger.info("{}", jsonBook);
 
+       
 
 
-
+        /*
             request.getEntry().forEach(e -> {
                 e.getMessaging().forEach(m -> {
 
@@ -181,6 +167,8 @@ public class WebHook {
                         }
                 });
             });
+
+            */
 
     }
 
@@ -274,6 +262,27 @@ public class WebHook {
         // sendReply("The price is <var> please confirm and then answer picture postback, and then proceed with payment
         //
         */
+
+
+
+/*
+    //Custom controller for Noahs Company Endpoint
+    @PostMapping(value = "/companyEndpoint")
+    public void postUponClick(@RequestBody Data data){ // Model Class Data is Annotated with "@RequestBody"
+
+
+        // Model class contains Getters and Setters by default ->
+        // Use getters and setter in C# (I know that C# has those when you create model classes I think)
+        int originalRequestNumber = data.getOriginalRequestNumber();
+        // Store json in variable ^^
+        /*
+            data{
+                  "OriginalRequestNumber": int
+
+                }
+
+    }
+ */
 
 
 
