@@ -1,11 +1,10 @@
 package com.example.flowershopbot.controllers;
 
 import com.example.flowershopbot.configurations.MessageConfiguration;
-import com.example.flowershopbot.properties.data_reqbody.Data;
+import com.example.flowershopbot.properties.client_msg_config.TextMsgTop;
 import com.example.flowershopbot.properties.fb_templates.product_template.*;
 import com.example.flowershopbot.properties.fbattchment_config.*;
 import com.example.flowershopbot.properties.generic_template.*;
-import com.example.flowershopbot.properties.webhook_config.FacebookHookRequest;
 import com.example.flowershopbot.properties.webhook_config.FacebookMessageResponse;
 import com.example.flowershopbot.services.MessageService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,11 +15,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 
@@ -107,10 +108,11 @@ public class WebHook {
 
 
     //This is necessary for register a webhook in facebook
-    @GetMapping(value = "/webhook")
+    @GetMapping(value = "/messaging-webhook")
     @ResponseStatus(HttpStatus.OK)
     public String get(@RequestParam(name = "hub.verify_token") String token,
                       @RequestParam(name = "hub.challenge") String challenge) {
+        System.out.println("Event triggered.");
         if (token != null && !token.isEmpty() && token.equals(VERIFY_TOKEN)) {
             return challenge;
         } else {
@@ -131,46 +133,80 @@ public class WebHook {
 
 
     //This method  reply all messages with: 'This is a test message'
-    @PostMapping(value = "/webhook")
+    @PostMapping(value = "/messaging-webhook")
     @ResponseStatus(HttpStatus.OK)
-    public void post(@RequestBody FacebookHookRequest request) throws JsonProcessingException { //@RequestBody ){
+    public void post(@RequestBody TextMsgTop request) throws JsonProcessingException { //@RequestBody ){ @RequestBody FacebookHookRequest request
 
+        System.out.println("Message received");
 
         ObjectMapper mapper = new ObjectMapper();
         String jsonBook = mapper.writeValueAsString(request);
-        logger.info("{}", jsonBook);
-
-       
+        logger.info("{}", jsonBook); //Write JSON Request Body being sent
 
 
-        /*
-            request.getEntry().forEach(e -> {
-                e.getMessaging().forEach(m -> {
 
-                    String id = m.getSender().get("id");
-                    String payload = null;
-                    String userMsg = null;
-                    String github = null;
 
-                    if(m.getMessage() == null){
-                        payload = m.getPostback().getPayload();
-                        System.out.println(payload);
-                    }
-                    else{
-                        userMsg = m.getMessage().getText();
-                    }
 
-                    try {
-                            messageService.botRouteMessage(id, userMsg, payload);
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
+
+
+/*
+        request.getEntry().forEach(e -> {
+            e.getMessaging().forEach(m -> {
+
+                String id = m.getSender().getId();
+                String payload = null;
+                String userMsg = null;
+                String github = null;
+
+
+
+
+
                 });
             });
+*/
 
-            */
+               /*
+                if(m.getMessage() == null){
+                    payload = m.getPostback().getPayload();
+                    System.out.println(payload);
+                }
+                else{
+                    userMsg = m.getMessage().getText();
+                }
+                 try {
+                    messageService.botRouteMessage(id, userMsg, payload);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                */
 
     }
+
+  public static AtomicBoolean checkForPostback(TextMsgTop clientRequestJson){
+        AtomicBoolean postbackFlag = new AtomicBoolean(false);
+
+        clientRequestJson.getEntry().forEach(e -> {
+          e.getMessaging().forEach(m -> {
+              Object message = m.getMessage();
+              Object postback = m.getPostback();
+
+              if(postback != null){
+                  postbackFlag.set(true);
+                  System.out.println("yes");
+              }
+              else{
+                  postbackFlag.set(false);
+                  System.out.print("false");
+
+              }
+
+          });
+      });
+
+        return postbackFlag;
+
+  }
 
 
     public static boolean isNumeric(String strNum) {
